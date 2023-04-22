@@ -1,4 +1,6 @@
 ﻿using NUnit.Framework;
+using TransGr8_DD_Test.Helpers;
+using TransGr8_DD_Test.Services;
 
 namespace TransGr8_DD_Test.Tests
 {
@@ -6,8 +8,6 @@ namespace TransGr8_DD_Test.Tests
 	[TestFixture]
 	public class SpellCheckerTests
 	{
-
-
 		private List<Spell> spells;
 		private User user;
 
@@ -15,56 +15,18 @@ namespace TransGr8_DD_Test.Tests
 		public void Setup()
 		{
 
-			spells = new List<Spell>();
-			spells.Add(new Spell
-			{
-				Name = "Fireball",
-				Level = 3,
-				CastingTime = "1 action",
-				Components = "V, S, M (a tiny ball of bat guano and sulfur)",
-				Range = 150,
-				Duration = "Instantaneous",
-				SavingThrow = "Dexterity"
-			});
-			spells.Add(new Spell
-			{
-				Name = "Magic Missile",
-				Level = 1,
-				CastingTime = "1 action",
-				Components = "V, S",
-				Range = 120,
-				Duration = "Instantaneous",
-				SavingThrow = ""
-			});
-			spells.Add(new Spell
-			{
-				Name = "Cure Wounds",
-				Level = 1,
-				CastingTime = "1 action",
-				Components = "V, S",
-				Range = 1,
-				Duration = "Instantaneous",
-				SavingThrow = ""
-			});
+			spells = SpellService.GetAll();
 
-
-			// Create a new User object with default values for testing.
-			user = new User
-			{
-				Level = 3,
-				HasVerbalComponent = true,
-				HasSomaticComponent = true,
-				HasMaterialComponent = true,
-				Range = 200,
-				HasConcentration = true
-			};
+            // Create a new User object with default values for testing.
+            user = UserService.GetAll().First();
 		}
 
 		[Test]
 		public void TestCanUserCastSpellReturnsTrue()
 		{
+			LoggerHelper.Log().Information("Test Can User Cast Spell Returns True");
 			// Arrange
-			SpellChecker spellChecker = new SpellChecker(spells);
+			SpellChecker spellChecker = new SpellChecker();
 			string spellName = "Fireball";
 
 			// Act
@@ -77,8 +39,9 @@ namespace TransGr8_DD_Test.Tests
 		[Test]
 		public void TestCanUserCastSpellReturnsFalseForInsufficientLevel()
 		{
-			// Arrange
-			SpellChecker spellChecker = new SpellChecker(spells);
+			LoggerHelper.Log().Information("Test Can User Cast Spell Returns False For Insufficient Level");
+            // Arrange
+            SpellChecker spellChecker = new SpellChecker();
 			string spellName = "Fireball";
 			user.Level = 2;
 
@@ -92,8 +55,9 @@ namespace TransGr8_DD_Test.Tests
 		[Test]
 		public void TestCanUserCastSpellReturnsFalseForMissingVerbalComponent()
 		{
-			// Arrange
-			SpellChecker spellChecker = new SpellChecker(spells);
+			LoggerHelper.Log().Information("Test Can User Cast Spell Returns False For Missing Verbal Component");
+            // Arrange
+            SpellChecker spellChecker = new SpellChecker();
 			string spellName = "Command";
 			user.HasVerbalComponent = false;
 
@@ -107,8 +71,9 @@ namespace TransGr8_DD_Test.Tests
 		[Test]
 		public void TestCanUserCastSpellReturnsFalseForMissingSomaticComponent()
 		{
-			// Arrange
-			SpellChecker spellChecker = new SpellChecker(spells);
+			LoggerHelper.Log().Information("Test Can User Cast Spell Returns False For Missing Somatic Component");
+            // Arrange
+            SpellChecker spellChecker = new SpellChecker();
 			string spellName = "Cure Wounds";
 			user.HasSomaticComponent = false;
 
@@ -122,8 +87,9 @@ namespace TransGr8_DD_Test.Tests
 		[Test]
 		public void TestCanUserCastSpellReturnsFalseForMissingMaterialComponent()
 		{
-			// Arrange
-			SpellChecker spellChecker = new SpellChecker(spells);
+            LoggerHelper.Log().Information("Test Can User Cast Spell Returns False For Missing Material Component");
+            // Arrange
+            SpellChecker spellChecker = new SpellChecker();
 			string spellName = "Identify";
 			user.HasMaterialComponent = false;
 
@@ -137,8 +103,9 @@ namespace TransGr8_DD_Test.Tests
 		[Test]
 		public void TestCanUserCastSpellReturnsFalseForInsufficientRange()
 		{
-			// Arrange
-			SpellChecker spellChecker = new SpellChecker(spells);
+            LoggerHelper.Log().Information("Test Can User Cast Spell Returns False For Insufficient Range");
+            // Arrange
+            SpellChecker spellChecker = new SpellChecker();
 			string spellName = "Fireball";
 			user.Range = 20;
 
@@ -152,8 +119,9 @@ namespace TransGr8_DD_Test.Tests
 		[Test]
 		public void TestCanUserCastSpellReturnsFalseForMissingConcentration()
 		{
-			// Arrange
-			SpellChecker spellChecker = new SpellChecker(spells);
+            LoggerHelper.Log().Information("Test Can User Cast Spell Returns False For Missing Concentration");
+            // Arrange
+            SpellChecker spellChecker = new SpellChecker();
 			string spellName = "Hold Person";
 			user.HasConcentration = false;
 
@@ -163,5 +131,21 @@ namespace TransGr8_DD_Test.Tests
 			// Assert
 			Assert.False(result);
 		}
-	}
+
+        [Test]
+        public void TestCanUserCastSpellReturnsFalseForMissingSavingThrow()
+        {
+            LoggerHelper.Log().Information("Test Can User Cast Spell Returns False For Missing Saving Throw");
+            // Arrange
+            SpellChecker spellChecker = new SpellChecker();
+            string spellName = "Fireball";
+            user.HasDexterity = false;
+
+            // Act
+            bool result = spellChecker.CanUserCastSpell(user, spellName);
+
+            // Assert
+            Assert.False(result);
+        }
+    }
 }

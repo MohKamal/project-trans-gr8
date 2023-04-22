@@ -8,5 +8,7 @@
 		public bool HasMaterialComponent { get; set; }
 		public int Range { get; set; }
 		public bool HasConcentration { get; set; }
-	}
+		public bool HasDexterity { get; set; }
+        
+    }
 }

@@ -1,56 +1,38 @@
-﻿namespace TransGr8_DD_Test
+﻿using TransGr8_DD_Test.Services;
+
+namespace TransGr8_DD_Test
 {
-	public class SpellChecker
+    /// <summary>
+    /// This class inherit's from the AbstractSpellChecker to implement the task function
+    /// </summary>
+    public class SpellChecker: AbstractSpellChecker
 	{
-		private readonly List<Spell> _spellList;
 
-		public SpellChecker(List<Spell> spells)
-		{
-			_spellList = spells;
-		}
+		public SpellChecker() : base() { }
 
-		public bool CanUserCastSpell(User user, string spellName)
+		/// <summary>
+		/// The task function, check if the user can cast a spell
+		/// </summary>
+		/// <param name="user"></param>
+		/// <param name="spellName"></param>
+		/// <returns></returns>
+		public override bool CanUserCastSpell(User user, string spellName)
 		{
-			Spell spell = _spellList.Find(s => s.Name == spellName);
-			
-			if (user.Level < spell.Level)
-			{
-				return false;
-			}
-			if (spell.Components.Contains("V"))
-			{
-				if (!user.HasVerbalComponent)
-				{
-					return false;
-				}
-			}
-			else if (spell.Components.Contains("S"))
-			{
-				if (!user.HasSomaticComponent)
-				{
-					return false;
-				}
-			}
-			else if (spell.Components.Contains("M"))
-			{
-				if (!user.HasMaterialComponent)
-				{
-					return false;
-				}
-			}
-			if (user.Range < spell.Range)
-			{
-				return false;
-			}
-			if (spell.Duration.Contains("Concentration"))
-			{
-				if (!user.HasConcentration)
-				{
-					return false;
-				}
-			}
-			// Add additional checks as needed for specific saving throws or other requirements.
-			return true;
+			Spell spell =SpellService.getSpellByName(spellName);
+
+			// if not object were provided, abort
+			if (spell == null) return false;
+			if (user == null) return false;
+
+			// Check spell conditions
+			if (!HasUserSpellComponents(user, spell)) return false;
+			if (!HasUserASpellCondition(user, spell, "Level")) return false;
+			if (!HasUserASpellCondition(user, spell, "Range")) return false;
+			if (!HasUserDuration(user, spell)) return false;
+			if (!HasUserSavingThrow(user, spell)) return false;
+
+            // if all the conditions a satisfied, the user can cast this spell
+            return true;
 		}
 		
 	}
